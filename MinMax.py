@@ -34,7 +34,7 @@ thread_pool = []
 def train_model(i, j, features, labels):
   print "start model {}:{} training".format(i, j)
   start_time = time.time()
-  clf = svm.SVC(kernel='sigmoid')
+  clf = svm.SVC(kernel='rbf', gamma=0.7, C=1)
   clf.fit(features, labels)
   models[i * 4 + j] = clf
   delta = time.time() - start_time
@@ -62,6 +62,7 @@ delta = time.time() - start_time
 print "finish training with {}s".format(delta)
 
 # start evaluating the precision
+print "start evaluation"
 valid_labels = validation[:, 0]
 valid_features = validation[:, 1:]
 
@@ -86,8 +87,11 @@ def predict(fs):
   return res
 
 
-res = predict(valid_features)
-precision, recall, threshold = metrics.precision_recall_curve(valid_labels, res)
+res = np.asarray(predict(valid_features))
+print valid_labels
+print res
+precision = metrics.precision_score(valid_labels, res, average="binary")
+recall = metrics.recall_score(valid_labels, res, average="binary")
 print "precision: {}, recall: {}".format(precision, recall)
 
 

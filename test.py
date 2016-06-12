@@ -20,7 +20,7 @@ validation = matrix[train_size:][:]
 training_label = training[:, 0]
 training_feature = training[:, 1:]
 
-clf = svm.SVC(kernel='sigmoid')
+clf = svm.SVC(kernel='rbf', gamma=0.7, C=1)
 print "start training"
 start_time = time.time()
 clf.fit(training_feature, training_label)
@@ -33,5 +33,6 @@ print "start evaluation"
 valid_labels = validation[:, 0]
 valid_features = validation[:, 1:]
 res = clf.predict(valid_features)
-precision, recall, threshold = metrics.precision_recall_curve(valid_labels, res)
+precision = metrics.precision_score(valid_labels, res, average="binary")
+recall = metrics.recall_score(valid_labels, res, average="binary")
 print "precision: {}, recall: {}".format(precision, recall)
