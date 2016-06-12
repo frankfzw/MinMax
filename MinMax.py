@@ -6,6 +6,7 @@ import time
 import threading
 import sys
 from sklearn import svm
+from sklearn import metrics
 
 file_prefix = os.getcwd()
 
@@ -59,4 +60,34 @@ for t in thread_pool:
 
 delta = time.time() - start_time
 print "finish training with {}s".format(delta)
+
+# start evaluating the precision
+valid_labels = validation[:, 0]
+valid_features = validation[:, 1:]
+
+def predict(fs):
+  number = len(fs)
+  res = []
+  tmp_max = []
+  for i in range(0, 4):
+    tmp = []
+    for j in range(0, 4):
+      tmp.append(models[i * 4 + j].predict(fs))
+    tmp_array = np.asarray(tmp)
+    tmp_min = []
+    for j in range(0, number):
+      tmp_min.append(min(tmp_array[:, j]))
+    tmp_max.append(tmp_min)
+
+  tmp_max_array = np.asarray(tmp_max)
+  for i in range(0, number):
+    res.append(max(tmp_max_array[:, i]))
+
+  return res
+
+
+res = predict(valid_features)
+precision, recall, threshold = metrics.precision_recall_curve(valid_labels, res)
+print "precision: {}, recall: {}".format(precision, recall)
+
 

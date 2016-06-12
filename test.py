@@ -4,6 +4,7 @@ import os
 import numpy as np
 import time
 from sklearn import svm
+from sklearn import metrics
 
 file_prefix = os.getcwd()
 
@@ -25,3 +26,12 @@ start_time = time.time()
 clf.fit(training_feature, training_label)
 delta = time.time() - start_time
 print "finish traning with {}s".format(delta)
+
+
+# start evaluating the precision
+print "start evaluation"
+valid_labels = validation[:, 0]
+valid_features = validation[:, 1:]
+res = clf.predict(valid_features)
+precision, recall, threshold = metrics.precision_recall_curve(valid_labels, res)
+print "precision: {}, recall: {}".format(precision, recall)
